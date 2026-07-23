@@ -1,0 +1,323 @@
+<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#3f008e",
+                        "primary": "#d2bbff",
+                        "background": "#0a141d",
+                        "surface-container-high": "#212b34",
+                        "primary-fixed": "#eaddff",
+                        "surface-container-lowest": "#060f17",
+                        "inverse-surface": "#dae3f0",
+                        "outline-variant": "#4a4455",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#2c363f",
+                        "outline": "#958da1",
+                        "surface-variant": "#2c363f",
+                        "on-secondary-fixed": "#001f26",
+                        "secondary-fixed": "#acedff",
+                        "inverse-primary": "#732ee4",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "on-secondary": "#003640",
+                        "tertiary": "#c9c6c5",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "surface-tint": "#d2bbff",
+                        "surface": "#0a141d",
+                        "surface-container-low": "#131d25",
+                        "tertiary-container": "#686666",
+                        "on-primary-container": "#ede0ff",
+                        "tertiary-fixed-dim": "#c9c6c5",
+                        "tertiary-fixed": "#e5e2e1",
+                        "on-tertiary": "#313030",
+                        "on-surface-variant": "#ccc3d8",
+                        "secondary-container": "#03b5d3",
+                        "surface-bright": "#313a44",
+                        "secondary": "#4cd7f6",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-tertiary-container": "#e8e5e4",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#172129",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "on-secondary-container": "#00424e",
+                        "on-primary-fixed": "#25005a",
+                        "on-background": "#dae3f0",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "surface-dim": "#0a141d",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "primary-container": "#7c3aed",
+                        "on-surface": "#dae3f0",
+                        "inverse-on-surface": "#28313b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-margin": "24px",
+                        "unit": "4px",
+                        "toolbar-padding": "12px",
+                        "glass-blur": "12px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "label-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-background text-on-surface font-body-md overflow-hidden select-none">
+<!-- Canvas Layer -->
+<div id="canvas" class="fixed inset-0 canvas-grid bg-surface-container-lowest z-0 overflow-hidden">
+<!-- Mock Content: Flow Chart -->
+<div class="absolute top-[20%] left-[30%]">
+<svg width="400" height="200" viewBox="0 0 400 200" class="drop-shadow-xl">
+<defs>
+<linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" style="stop-color:#d2bbff;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#4cd7f6;stop-opacity:1"></stop>
+</linearGradient>
+</defs>
+<rect x="10" y="10" width="120" height="60" rx="12" fill="none" stroke="url(#flowGrad)" stroke-width="2"></rect>
+<text x="70" y="45" text-anchor="middle" fill="#dae3f0" class="font-label-md text-[14px]">Concept</text>
+<path d="M 130 40 L 250 100" stroke="url(#flowGrad)" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="4"></path>
+<rect x="250" y="80" width="120" height="60" rx="12" fill="none" stroke="url(#flowGrad)" stroke-width="2"></rect>
+<text x="310" y="115" text-anchor="middle" fill="#dae3f0" class="font-label-md text-[14px]">Prototype</text>
+</svg>
+</div>
+<!-- Mock Content: Sticky Note -->
+<div class="absolute top-[45%] left-[20%] glass-panel p-6 w-48 h-48 rotate-3 shadow-2xl flex flex-col justify-between" style="background: rgba(210, 187, 255, 0.1); border-color: rgba(210, 187, 255, 0.4);">
+<div class="font-headline-md text-primary opacity-90">Idea Spark</div>
+<div class="text-on-surface-variant font-body-md text-sm">Refactor the navigation module for better scalability.</div>
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-primary scale-75">push_pin</span>
+</div>
+</div>
+<!-- Mock Content: Image Frame -->
+<div class="absolute top-[15%] left-[60%] glass-panel p-2 shadow-2xl rotate-[-2deg]">
+<div class="w-64 h-48 rounded bg-surface overflow-hidden relative">
+<img class="w-full h-full object-cover opacity-80 transition-opacity hover:opacity-100" data-alt="A sophisticated digital interface moodboard featuring deep purple and electric blue gradients. The image shows abstract tech patterns, blurred light streaks, and minimalist UI elements arranged in a clean, professional dark-mode composition for a high-end software development environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANXx_GaeEpraW03JFbxozB7YiUbG00QoHNY9YReu_2Wv5Xx9JdDk_Hv5VHcHMtI2N90eripGNYCvpAKZ8URvQ6U5ZDOla8vyXh80sDeDNPUuSxA8Uwiu8nM160nxfhWWTYtyyTKtrgPqQZBpT5H9FnpZ2gGXpMGX-sinm-PORywIqJUt-NB-ZAvXEpWKgLWFn5Rz4HHDfAZeOrdFrbKO94Q14vb7Fqye1-EBGn_sIU313-uNqxJfXtHNASqQljziUwG40afAnaZqM">
+<div class="absolute bottom-2 left-2 px-2 py-1 bg-surface-container-high/80 backdrop-blur-md rounded text-[10px] font-label-md">moodboard_01.jpg</div>
+</div>
+</div>
+<!-- Collaborative Cursors -->
+<div class="absolute pointer-events-none cursor-trail flex items-center gap-2" id="cursor-alex" style="left: 45%; top: 35%;">
+<span class="material-symbols-outlined text-secondary fill-current rotate-[-25deg] scale-125">near_me</span>
+<span class="bg-secondary text-on-secondary px-2 py-1 rounded-sm text-xs font-bold whitespace-nowrap shadow-lg">Alex K.</span>
+</div>
+<div class="absolute pointer-events-none cursor-trail flex items-center gap-2" id="cursor-sarah" style="left: 55%; top: 60%;">
+<span class="material-symbols-outlined text-primary fill-current rotate-[-25deg] scale-125">near_me</span>
+<span class="bg-primary text-on-primary px-2 py-1 rounded-sm text-xs font-bold whitespace-nowrap shadow-lg">Sarah J.</span>
+</div>
+</div>
+<!-- Top Bar -->
+<header class="fixed top-container-margin left-container-margin right-container-margin h-14 glass-panel rounded-xl z-50 flex items-center justify-between px-6 shadow-2xl">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary font-bold">grid_view</span>
+</div>
+<h1 class="font-headline-md text-headline-md bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Project Horizon</h1>
+</div>
+<div class="h-4 w-px bg-outline-variant/30 mx-2"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-variant/50 transition-colors text-on-surface-variant font-label-md">
+<span class="">Untitled Draft</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="flex items-center gap-6">
+<!-- User Avatars -->
+<div class="flex -space-x-3 items-center">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high overflow-hidden" title="Alex K.">
+<img class="w-full h-full object-cover" data-alt="Close-up professional headshot of a creative male designer with glasses in a soft-lit modern studio setting, vibrant purple background lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnT6PhORBp0U0VXFIbd6qxpsT1LT30PSY-SN7Ur5Xvc4U-psm7MkpK9xMNM8cWJwKVhTtiL3PXHZWhyt9OWxTZLIrFCVg0vqzWWDUL_yX4toakNskc3ioBan1yLhjNk0_DJTQNzEdguowU7ZFBDbOm7AxHrLyiAqUrlC8rhzLHNJzyqS1n-gm5pTBGq6LqE6CjPP162w17Bfbyj-VYjGcKCq8biNGB8qzaPDiraxzyQJMkp3q1QZOdttjPLDRoCEOaluys1_a6xUE">
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high overflow-hidden" title="Sarah J.">
+<img class="w-full h-full object-cover" data-alt="Close-up professional headshot of a smiling female engineer with a tech-focused, professional aesthetic, vibrant cyan background lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6VJfUBL9aH58LE7f_ciahMX7c_-Gy54n1SeS1-OwP28BEZE24i6ITlB3VC0mIeC-yvsF6kw09w_m9A4j5W_j0nAKJn1pZFACJVEh7Rrkn-bVb6y8SVh_NIB0MMXmUVypY_a1OBO1Zpnsji12egUkYEboL2Dd_JdgImlqpqGuKHVOUAjnSK7oCi7pffVfU26EgXdbLGOgeBVAjl1dE5RusLOrFzlkUR9XDk6ZkcjNnmp0RMcAaUZKQYtt4me887HdAKLv3nEDjL28">
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center bg-primary/20 text-primary font-bold text-xs">
+                    +2
+                </div>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-on-primary px-4 py-2 rounded-lg font-label-md flex items-center gap-2 transition-transform active:scale-95 shadow-[0_0_15px_rgba(210,187,255,0.3)]">
+<span class="material-symbols-outlined text-sm">person_add</span>
+                Share
+            </button>
+</div>
+</header>
+<!-- Floating Toolbar (Left) -->
+<nav class="fixed left-container-margin top-1/2 -translate-y-1/2 w-14 glass-panel rounded-2xl flex flex-col items-center py-4 gap-4 z-50 shadow-2xl">
+<button class="p-2.5 rounded-xl bg-secondary text-on-secondary shadow-[0_0_12px_rgba(76,215,246,0.4)]" title="Select">
+<span class="material-symbols-outlined">near_me</span>
+</button>
+<button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-primary" title="Draw">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-primary" title="Shapes">
+<span class="material-symbols-outlined">square</span>
+</button>
+<button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-primary" title="Text">
+<span class="material-symbols-outlined">text_fields</span>
+</button>
+<button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-primary" title="Sticky Notes">
+<span class="material-symbols-outlined">sticky_note_2</span>
+</button>
+<button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-primary" title="Images">
+<span class="material-symbols-outlined">image</span>
+</button>
+<div class="w-8 h-px bg-outline-variant/30"></div><button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-primary" title="Toggle Theme">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="p-2.5 rounded-xl hover:bg-surface-variant/50 text-on-surface-variant transition-all hover:text-error" title="Eraser">
+<span class="material-symbols-outlined">ink_eraser</span>
+</button>
+</nav>
+<!-- Properties Panel (Right) -->
+<aside class="fixed right-container-margin top-1/2 -translate-y-1/2 w-64 glass-panel rounded-2xl p-6 z-50 shadow-2xl">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-[16px] text-primary">Properties</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm cursor-pointer">settings</span>
+</div>
+<!-- Color Swatches -->
+<div class="space-y-4">
+<label class="font-label-md text-on-surface-variant block uppercase tracking-wider text-[10px]">Color Palette</label>
+<div class="grid grid-cols-5 gap-2">
+<button class="w-8 h-8 rounded-full border-2 border-on-surface-variant bg-primary ring-2 ring-transparent ring-offset-2 ring-offset-background hover:ring-primary transition-all"></button>
+<button class="w-8 h-8 rounded-full bg-secondary hover:ring-2 hover:ring-secondary ring-offset-2 ring-offset-background transition-all"></button>
+<button class="w-8 h-8 rounded-full bg-[#f87171] hover:ring-2 hover:ring-[#f87171] ring-offset-2 ring-offset-background transition-all"></button>
+<button class="w-8 h-8 rounded-full bg-[#fbbf24] hover:ring-2 hover:ring-[#fbbf24] ring-offset-2 ring-offset-background transition-all"></button>
+<button class="w-8 h-8 rounded-full bg-on-background/10 border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+<!-- Stroke Weight -->
+<div class="mt-8 space-y-4">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-on-surface-variant block uppercase tracking-wider text-[10px]">Stroke Weight</label>
+<span class="text-xs text-primary font-bold">2px</span>
+</div>
+<div class="relative h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-[40%] bg-primary"></div>
+<div class="absolute left-[40%] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-on-primary-container shadow-glow"></div>
+</div>
+</div>
+<!-- Opacity -->
+<div class="mt-8 space-y-4">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-on-surface-variant block uppercase tracking-wider text-[10px]">Opacity</label>
+<span class="text-xs text-primary font-bold">85%</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary" type="range">
+</div>
+<!-- Layer Info -->
+<div class="mt-8 pt-6 border-t border-outline-variant/30 space-y-3">
+<div class="flex items-center gap-3 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-sm">layers</span>
+<span class="">Layer: Front</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span class="">Locked</span>
+</div>
+</div>
+</aside>
+<!-- Bottom Controls -->
+<footer class="fixed bottom-container-margin left-1/2 -translate-x-1/2 glass-panel h-12 rounded-xl flex items-center px-4 gap-4 z-50 shadow-2xl">
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded-lg hover:bg-surface-variant/50 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">undo</span>
+</button>
+<button class="p-1.5 rounded-lg hover:bg-surface-variant/50 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">redo</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant/30"></div>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded hover:bg-surface-variant/50 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<span class="font-label-md text-sm text-on-surface min-w-[48px] text-center">100%</span>
+<button class="p-1 rounded hover:bg-surface-variant/50 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<div class="h-4 w-px bg-outline-variant/30"></div>
+<button class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-surface-variant/50 text-on-surface-variant transition-colors group" id="minimap-toggle">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">map</span>
+<span class="font-label-md text-sm">Minimap</span>
+</button>
+</footer>
+<!-- Minimap Preview (Hidden by default) -->
+<div class="fixed bottom-20 right-container-margin w-48 h-32 glass-panel rounded-xl border border-outline-variant/50 overflow-hidden shadow-2xl p-1 pointer-events-none opacity-0 transition-opacity" id="minimap">
+<div class="w-full h-full bg-surface-container-lowest/50 rounded-lg relative">
+<!-- Simplified representation of content -->
+<div class="absolute top-[20%] left-[30%] w-8 h-4 border border-primary/40 rounded-sm"></div>
+<div class="absolute top-[45%] left-[20%] w-6 h-6 bg-primary/20 rounded-sm"></div>
+<div class="absolute top-[15%] left-[60%] w-10 h-8 bg-surface-variant/50 rounded-sm"></div>
+<!-- Current view frame -->
+<div class="absolute inset-2 border-2 border-secondary/50 rounded shadow-[0_0_8px_rgba(76,215,246,0.3)]"></div>
+</div>
+</div>
+<!-- Atmospheric Glows -->
+<div class="fixed top-0 left-1/2 -translate-x-1/2 w-1/2 h-32 bg-primary/10 blur-[100px] pointer-events-none z-10 glow-accent"></div>
+<script>
+        // Simple micro-interactions
+        const minimapToggle = document.getElementById('minimap-toggle');
+        const minimap = document.getElementById('minimap');
+        let isMinimapVisible = false;
+
+        minimapToggle.addEventListener('click', () => {
+            isMinimapVisible = !isMinimapVisible;
+            minimap.style.opacity = isMinimapVisible ? '1' : '0';
+        });
+
+        // Simulate moving cursors slightly for realism
+        const cursors = {
+            alex: { el: document.getElementById('cursor-alex'), x: 45, y: 35 },
+            sarah: { el: document.getElementById('cursor-sarah'), x: 55, y: 60 }
+        };
+
+        setInterval(() => {
+            Object.keys(cursors).forEach(id => {
+                const c = cursors[id];
+                c.x += (Math.random() - 0.5) * 1.5;
+                c.y += (Math.random() - 0.5) * 1.5;
+                c.el.style.left = `${c.x}%`;
+                c.el.style.top = `${c.y}%`;
+            });
+        }, 150);
+
+        // Canvas Zoom interaction logic (Visual Only)
+        let zoom = 100;
+        const zoomDisplay = document.querySelector('span.min-w-\\[48px\\]');
+        document.querySelectorAll('footer button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const text = btn.querySelector('span')?.textContent;
+                if(text === 'add') {
+                    zoom = Math.min(zoom + 10, 400);
+                    zoomDisplay.textContent = `${zoom}%`;
+                } else if(text === 'remove') {
+                    zoom = Math.max(zoom - 10, 10);
+                    zoomDisplay.textContent = `${zoom}%`;
+                }
+            });
+        });
+    </script>
+
+</body></html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CollabBoard - Real-time Whiteboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#e8e5e4",
+                    "surface-container-low": "#131d25",
+                    "secondary-fixed": "#acedff",
+                    "tertiary-container": "#686666",
+                    "surface-container-highest": "#2c363f",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "secondary": "#4cd7f6",
+                    "surface-variant": "#2c363f",
+                    "secondary-container": "#03b5d3",
+                    "surface-tint": "#d2bbff",
+                    "surface": "#0a141d",
+                    "secondary-fixed-dim": "#4cd7f6",
+                    "on-primary": "#3f008e",
+                    "on-error": "#690005",
+                    "on-background": "#dae3f0",
+                    "surface-bright": "#313a44",
+                    "on-secondary-container": "#00424e",
+                    "on-tertiary": "#313030",
+                    "on-secondary-fixed-variant": "#004e5c",
+                    "surface-dim": "#0a141d",
+                    "tertiary-fixed": "#e5e2e1",
+                    "on-primary-container": "#ede0ff",
+                    "inverse-primary": "#732ee4",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "outline-variant": "#4a4455",
+                    "primary-fixed-dim": "#d2bbff",
+                    "primary": "#d2bbff",
+                    "primary-fixed": "#eaddff",
+                    "tertiary-fixed-dim": "#c9c6c5",
+                    "on-surface": "#dae3f0",
+                    "outline": "#958da1",
+                    "inverse-surface": "#dae3f0",
+                    "tertiary": "#c9c6c5",
+                    "surface-container-high": "#212b34",
+                    "background": "#0a141d",
+                    "on-secondary-fixed": "#001f26",
+                    "surface-container-lowest": "#060f17",
+                    "error-container": "#93000a",
+                    "on-secondary": "#003640",
+                    "on-error-container": "#ffdad6",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed-variant": "#474646",
+                    "inverse-on-surface": "#28313b",
+                    "primary-container": "#7c3aed",
+                    "surface-container": "#172129",
+                    "on-surface-variant": "#ccc3d8",
+                    "on-primary-fixed": "#25005a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "toolbar-padding": "12px",
+                    "gutter": "16px",
+                    "container-margin": "24px",
+                    "unit": "4px",
+                    "glass-blur": "12px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "headline-lg-mobile": ["Geist"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0a0a0a;
+            color: #dae3f0;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(44, 54, 63, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(149, 141, 161, 0.2);
+        }
+        .canvas-grid {
+            background-image: radial-gradient(rgba(149, 141, 161, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #d2bbff, #4cd7f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .active-glow {
+            box-shadow: 0 0 20px -5px rgba(124, 58, 237, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface/50 backdrop-blur-glass-blur border-b border-outline-variant/30 shadow-sm">
+<div class="flex justify-between items-center px-container-margin py-toolbar-padding w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-display-lg text-headline-md bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">CollabBoard</span>
+</div>
+<button class="text-primary font-label-md px-4 py-2 hover:bg-surface-variant/50 transition-colors rounded-lg active:scale-95">Sign In</button>
+</div>
+</header>
+<main class="relative pt-24 pb-12 canvas-grid min-h-screen">
+<!-- Hero Section -->
+<section class="px-container-margin py-16 flex flex-col items-center text-center max-w-2xl mx-auto">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-container/10 border border-primary/20 mb-6 animate-pulse">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-primary text-[12px] font-bold tracking-wider uppercase">Live Collaboration Enabled</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-6 leading-tight">
+                Draw, Plan &amp; Collaborate in <span class="gradient-text">Real Time</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10 leading-relaxed">
+                Create a room, share the code, and whiteboard together — no sign-up needed. Experience the fluid rhythm of creative flow.
+            </p>
+<!-- Action Group -->
+<div class="w-full flex flex-col gap-4">
+<button class="w-full py-4 rounded-xl font-headline-md text-headline-md text-white bg-gradient-to-r from-primary-container to-secondary-container shadow-lg active-glow active:scale-[0.98] transition-all">
+                    Create Room
+                </button>
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant">vpn_key</span>
+</div>
+<input class="w-full bg-surface-container-highest/60 border border-outline-variant/50 rounded-xl py-4 pl-12 pr-24 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-on-surface-variant/50" placeholder="Enter room code..." type="text"/>
+<button class="absolute right-2 top-2 bottom-2 px-6 rounded-lg bg-surface-container-high text-primary font-bold hover:bg-surface-bright transition-colors">
+                        Join
+                    </button>
+</div>
+</div>
+<!-- Visual Decoration -->
+<div class="mt-12 w-full aspect-video glass-panel rounded-2xl overflow-hidden relative group">
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-secondary/5"></div>
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A cinematic, high-contrast dark-mode user interface of a digital whiteboarding application. The screen shows vibrant purple and cyan glowing strokes and geometric shapes on a dark obsidian background with a subtle dot grid. The aesthetic is sophisticated and futuristic, featuring translucent glass panels and neon light accents reflecting off the digital surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeo9yy-LInLK1ZUpLiwbZHqg75XICcf_N49CqVzpmr_j1GcamKlh6MP-JIrDDnFB1CitbAFsEfmJHzw3X8v5s46GGtexe0_pjjJiywP0ipjoCPMpPFPVTFi-elL1Z3oXKV0pLtj8wnvyQ_epLA7Me7Ma4QY223ZB-7jQOnWbU_G9OT8OtRG-J3kSC2mvWPvxuPLBcXSMHDjaYsw0ufQfPO97OEV_H8faxzW_up7I-nkNOIJXphs9pOjojQEuuCaqm-pRkqsPlB9Hc"/>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a diverse tech creative with soft studio lighting. The person has a friendly expression, set against a blurred minimalist office background with deep navy and violet tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAwgjGfV9D9wbcyZ0WMDn7-zkdGpHjIcH-6k_WwZTKRoN5Ll7iVrv7KHs1Y3u0RFegrRFx93wx7gd9fPdZf0E2MLZxcVsxIQ9AcxROAD0ezUjZnrC0nTC05yYqeJN2t8Qzib5KBgFwBqOPgeiTlZcWuSSZkNxFZTTFDbG91tp_I5H1fiwL1UKky8IjZ6P7ow3J-JSAOmlxeRSsp4FLW6gOxjmh_-hbllRPghnA3uew3ptw90_KApCghGkWeOeXxyOVlBgQHiiEpWc"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-secondary bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a young innovative designer with a clean aesthetic. The lighting is crisp and cool-toned, reflecting a high-tech studio environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwJ9nZhtTmRrwOm2-FUsW1PAnAYwLld25swfE1jPqqPo0lpc5kZ0gFJAQ2X-hrMh5GJwl-KWWV-tzbeGLo6sMDvNLXeO8VSRhWDN2AC8_XBUKZ8Ux7tCU6UJBx1bvfFxaSD4zTxtQ229atGRXZ8HF-6OQI6BegjtG75gWf7abaNlFDI5XPcuknmLzsXGiGGW8a6EQlX8oGsVYfwiHn_rb1xJ21DOwPX7FPWkqlN5VGk6NqO7JJmJZlOH0bnf5O2sxvcfQdy1F88f4"/>
+</div>
+<div class="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container-high border-2 border-outline text-[10px] font-bold">+4</div>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="px-container-margin py-12 flex flex-col gap-gutter max-w-5xl mx-auto">
+<h2 class="font-headline-md text-headline-md text-on-surface text-center mb-4">How it Works</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Step 1 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="font-display-lg text-headline-md gradient-text">1</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Create</h3>
+<p class="text-on-surface-variant leading-relaxed">Launch a new room instantly without registration.</p>
+</div>
+<!-- Step 2 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-4 group hover:border-secondary/50 transition-colors">
+<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="font-display-lg text-headline-md gradient-text">2</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Share</h3>
+<p class="text-on-surface-variant leading-relaxed">Copy your 6-digit code and send it to your team.</p>
+</div>
+<!-- Step 3 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="font-display-lg text-headline-md gradient-text">3</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Collaborate</h3>
+<p class="text-on-surface-variant leading-relaxed">Start drawing together on the shared canvas in real-time.</p>
+</div>
+</div>
+</section><section class="px-container-margin py-12 flex flex-col gap-gutter max-w-5xl mx-auto">
+<h2 class="font-headline-md text-headline-md text-on-surface text-center mb-4">Built for Velocity</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Feature 1 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Instant Rooms</h3>
+<p class="text-on-surface-variant leading-relaxed">Skip the onboarding. Launch a collaborative space in milliseconds and start ideating immediately.</p>
+</div>
+<!-- Feature 2 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-4 group hover:border-secondary/50 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Real-time Canvas</h3>
+<p class="text-on-surface-variant leading-relaxed">Low-latency engine ensures every stroke and move is synced perfectly across all devices globally.</p>
+</div>
+<!-- Feature 3 -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-4 group hover:border-primary/50 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">link</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Share via Code</h3>
+<p class="text-on-surface-variant leading-relaxed">No complicated links or permissions. Just a 6-digit code to bring your whole team onto the board.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-8 bg-surface dark:bg-surface border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row justify-center items-center gap-gutter px-container-margin">
+<div class="font-label-md text-label-md text-on-surface opacity-60">© 2024 CollabBoard. All rights reserved.</div>
+<div class="flex gap-6">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-secondary transition-colors cursor-pointer" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-secondary transition-colors cursor-pointer" href="#">Terms of Service</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-secondary transition-colors cursor-pointer" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+        // Subtle cursor following glow effect
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.createElement('div');
+            glow.className = 'fixed pointer-events-none w-64 h-64 bg-primary/5 rounded-full blur-3xl z-[-1] transition-opacity duration-1000';
+            glow.style.left = (e.clientX - 128) + 'px';
+            glow.style.top = (e.clientY - 128) + 'px';
+            
+            // Only keep one or two glows at a time for performance
+            const existingGlows = document.querySelectorAll('.fixed.pointer-events-none');
+            if (existingGlows.length > 2) {
+                existingGlows[0].remove();
+            }
+            
+            document.body.appendChild(glow);
+            setTimeout(() => {
+                glow.style.opacity = '0';
+                setTimeout(() => glow.remove(), 1000);
+            }, 100);
+        });
+
+        // Button feedback
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.96)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = '';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = '';
+            });
+        });
+    </script>
+</body></html>
