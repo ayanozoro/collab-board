@@ -149,37 +149,41 @@ src/
 ## 🗺️ Implementation Phases
 
 ### Phase 1 — Foundation & Landing Page
-- [ ] Clean up default Next.js boilerplate
-- [ ] Set up design tokens in `globals.css` (colors, fonts, spacing)
-- [ ] Build landing page: Hero, Create Room form, feature highlights
-- [ ] API route: `POST /api/rooms` → generate room ID, return join URL
-- [ ] Navigate to `/room/[roomId]` on form submit
+- [x] Clean up default Next.js boilerplate
+- [x] Set up design tokens in `globals.css` (colors, fonts, spacing)
+- [x] Build landing page: Hero, Create Room form, feature highlights
+- [x] API route: `POST /api/rooms` → generate room ID, return join URL
+- [x] Navigate to `/room/[roomId]` on form submit
 
 ### Phase 2 — Whiteboard (Single User)
-- [ ] Install `zustand` for tool/canvas state
-- [ ] `Canvas.tsx` — set up `<canvas>` with proper DPI scaling
-- [ ] `useCanvas.ts` — freehand draw (mouse + touch events)
-- [ ] `Toolbar.tsx` — pen, eraser, shapes (rect, circle, line), color picker, stroke size
-- [ ] Undo/redo stack (local)
-- [ ] Clear canvas button
+- [x] Install `zustand` for tool/canvas state
+- [x] `Canvas.tsx` — set up `<canvas>` with proper DPI scaling
+- [x] `useCanvas.ts` — freehand draw (mouse + touch events)
+- [x] `Toolbar.tsx` — pen, eraser, shapes (rect, circle, line), color picker, stroke size
+- [x] Undo/redo stack (local)
+- [x] Clear canvas button
 
 ### Phase 3 — WebSocket Server & Multiplayer Drawing
-- [ ] Set up custom server (`server.ts`) integrating `ws` with Next.js 16
-- [ ] Room registry (in-memory Map, upgrade to Redis later)
-- [ ] Broadcast draw-stroke, clear, undo events to all room members
-- [ ] `useWebSocket.ts` hook — connect on room mount, handle reconnect
-- [ ] Render remote strokes on canvas from WS events
-- [ ] Multiplayer cursor overlay (SVG layer above canvas)
-- [ ] Presence bar — show all users in room with color-coded avatars
+- [x] Set up standalone WS server (integrated via custom runner)
+- [x] Room registry (in-memory Map)
+- [x] Broadcast draw-stroke, clear, undo events to all room members
+- [x] `useWebSocket.ts` hook — connect on room mount, handle connection lifecycle
+- [x] Render remote strokes on canvas from WS events
+- [x] Multiplayer cursor overlay (SVG layer above canvas)
+- [x] Presence bar — show all users in room with color-coded avatars
 
 ### Phase 4 — Audio Communication (WebRTC)
 - [ ] `useAudio.ts` — `getUserMedia` for microphone access
 - [ ] WebRTC signalling via existing WebSocket server
 - [ ] `simple-peer` mesh: each user creates a peer connection to every other user
 - [ ] `AudioControls.tsx` — mic toggle (push-to-talk / open mic), mute all, volume per user
-- [ ] Visual speaking indicator on user avatar (Web Audio API analyser)
+- [ ] Visual speaking indicator (real-time voice waveforms using Web Audio API `AnalyserNode`)
+- [ ] Spatial audio panning: Use Web Audio `PannerNode` to dynamically position user voices in 3D space based on their relative coordinates on the board
 
 ### Phase 5 — Polish & Advanced Features
+- [ ] **Infinite Canvas**: Support board zooming (mouse wheel) and panning (spacebar drag or middle mouse click)
+- [ ] **Vector Path Smoothing**: Apply Catmull-Rom splines or simplification (RDP) algorithms to eliminate jagged freehand drawing strokes
+- [ ] **Laser Pointer**: A presenter tool that draws temporary glowing trails that fade out after 1.5 seconds
 - [ ] Host controls: lock canvas, kick user
 - [ ] Sticky notes (text boxes draggable on canvas)
 - [ ] Export canvas as PNG / SVG
@@ -187,6 +191,14 @@ src/
 - [ ] Responsive layout (tablet support)
 - [ ] Loading skeletons, error boundaries, offline banner
 - [ ] SEO meta tags and OG image for room share links
+
+### Phase 6 — Scaling & Production Readiness
+- [ ] **Horizontal WebSocket Scaling**: Integrate Redis Pub/Sub adapter to sync drawing events across multiple stateful node instances.
+- [ ] **State Persistence**: Cache room stroke states in Redis/DB to prevent canvas data loss during server restarts/crashes.
+- [ ] **Mesh to SFU Audio Migration**: Transition WebRTC connection architecture to a Selective Forwarding Unit (e.g., LiveKit or MediaSoup) for rooms larger than 8 users.
+- [ ] **Payload Optimization**: Implement Protocol Buffers or MessagePack binary serialization and delta coordinate compressions to reduce bandwidth.
+- [ ] **Multi-User E2E Testing**: Add automated multi-browser Playwright test scenarios simulating concurrent collaborators drawing on the same canvas.
+- [ ] **Canvas Rendering Optimization**: Add viewport-culling for infinite canvas pan/zoom setups.
 
 ---
 

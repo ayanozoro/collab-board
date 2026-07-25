@@ -16,6 +16,9 @@ interface CanvasStore {
   users: User[];
   cursors: Record<string, { x: number; y: number; name: string; color: string }>;
 
+  // Audio State
+  isMuted: boolean;
+
   setRoomId: (roomId: string) => void;
   setTool: (tool: Tool) => void;
   setColor: (color: string) => void;
@@ -36,6 +39,10 @@ interface CanvasStore {
   addRemoteStroke: (stroke: Stroke) => void;
   removeRemoteStroke: (strokeId: string) => void;
   clearRemoteCanvas: () => void;
+
+  // Audio Actions
+  toggleMute: () => void;
+  setSpeaking: (userId: string, isSpeaking: boolean) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>((set) => ({
@@ -50,6 +57,7 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   currentUser: null,
   users: [],
   cursors: {},
+  isMuted: true,
 
   setRoomId: (roomId) => set({ roomId }),
   setTool: (tool) => set({ tool }),
@@ -136,4 +144,10 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   clearRemoteCanvas: () => set({
     strokes: [],
   }),
+
+  // Audio Actions
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+  setSpeaking: (userId, isSpeaking) => set((state) => ({
+    users: state.users.map((u) => u.id === userId ? { ...u, isSpeaking } : u),
+  })),
 }));

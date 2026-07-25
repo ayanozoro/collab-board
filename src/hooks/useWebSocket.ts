@@ -1,6 +1,16 @@
 import { useEffect } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 
+type SignalingCallback = (data: any) => void;
+const signalingListeners = new Set<SignalingCallback>();
+
+export function addSignalingListener(cb: SignalingCallback) {
+  signalingListeners.add(cb);
+  return () => {
+    signalingListeners.delete(cb);
+  };
+}
+
 let globalWs: WebSocket | null = null;
 
 export function sendWSMessage(msg: any) {
@@ -43,12 +53,22 @@ export function useWebSocket(roomId: string) {
     setStrokes,
     updateCursor,
     removeCursor,
+    setSpeaking,
   } = useCanvasStore();
 
   useEffect(() => {
     if (!currentUser) return;
 
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
+    let wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      if (hostname && hostname !== "localhost" && hostname !== "127.0.0.1") {
+        wsUrl = wsUrl.replace("localhost", hostname);
+      }
+      if (window.location.protocol === "https:" && wsUrl.startsWith("ws://")) {
+        wsUrl = wsUrl.replace("ws://", "wss://");
+      }
+    }
     console.log(`Connecting to WebSocket: ${wsUrl}`);
     const ws = new WebSocket(wsUrl);
     globalWs = ws;
@@ -96,6 +116,16 @@ export function useWebSocket(roomId: string) {
               });
             }
             break;
+          case "user-speaking":
+            setSpeaking(data.userId, data.isSpeaking);
+            break;
+          case "rtc-offer":
+          case "rtc-answer":
+          case "rtc-ice":
+            if (data.targetUserId === currentUser?.id) {
+              signalingListeners.forEach((listener) => listener(data));
+            }
+            break;
         }
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
@@ -110,7 +140,7 @@ export function useWebSocket(roomId: string) {
     };
 
     ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
+      console.error(`WebSocket error connecting to ${wsUrl}:`, err);
     };
 
     return () => {
@@ -127,6 +157,7 @@ export function useWebSocket(roomId: string) {
     setStrokes,
     updateCursor,
     removeCursor,
+    setSpeaking,
   ]);
 
   return {

@@ -29,7 +29,11 @@ export default function PresenceBar({ roomId }: PresenceBarProps) {
           <div
             key={u.id}
             title={isSelf ? `${u.name} (You)` : u.name}
-            className={`relative flex h-8 w-8 -ml-2 first:ml-0 items-center justify-center rounded-full text-xs font-bold text-white ring-2 ring-[#0a141d] hover:-translate-y-1 hover:z-30 transition-all duration-200 cursor-default select-none`}
+            className={`relative flex h-8 w-8 -ml-2 first:ml-0 items-center justify-center rounded-full text-xs font-bold text-white ring-2 hover:-translate-y-1 hover:z-30 transition-all duration-200 cursor-default select-none ${
+              u.isSpeaking
+                ? "ring-[#10b981] scale-105 shadow-[0_0_12px_rgba(16,185,129,0.6)] z-20"
+                : "ring-[#0a141d]"
+            }`}
             style={{ backgroundColor: u.color }}
           >
             {getInitials(u.name)}

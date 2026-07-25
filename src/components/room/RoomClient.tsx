@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useCanvasStore } from "@/store/canvasStore";
 import { useWebSocket, sendCursorMove } from "@/hooks/useWebSocket";
+import { useAudio } from "@/hooks/useAudio";
 import Canvas, { type CanvasHandle } from "./Canvas";
 import Toolbar from "./Toolbar";
 import RoomHeader from "./RoomHeader";
@@ -71,6 +72,9 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
   // 2. Initialize WebSocket sync
   useWebSocket(roomId);
+
+  // 3. Initialize Audio communication
+  useAudio();
 
   // 3. Track and emit local cursor movements
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

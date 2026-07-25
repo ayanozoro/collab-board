@@ -1,5 +1,4 @@
 "use client";
-
 import { useRef, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useCanvas } from "@/hooks/useCanvas";
 import { useCanvasStore } from "@/store/canvasStore";
@@ -10,9 +9,7 @@ export interface CanvasHandle {
   clearCanvas: () => void;
 }
 
-interface CanvasProps {
-  roomId: string;
-}
+interface CanvasProps { roomId: string; }
 
 const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
   { roomId: _roomId }, ref
@@ -36,11 +33,6 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
-      
-      // Trigger redraw via store update/re-trigger
-      // (The hook handles redraw automatically on strokes change,
-      // but resizing clears the canvas, so calling direct redraw is handled by the hook's drawAll if exposed,
-      // or we can let the hook handle it since it redraws on mount/dimensions).
     }
     resize();
     window.addEventListener("resize", resize);
@@ -51,7 +43,7 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
     <canvas
       ref={canvasRef}
       id="collab-canvas"
-      className="touch-none flex-1"
+      className="touch-none"
       style={{ width: "100%", height: "100%", display: "block" }}
       onMouseDown={startDrawing}
       onMouseMove={draw}

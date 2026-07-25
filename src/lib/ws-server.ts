@@ -12,7 +12,7 @@ const roomUsers = new Map<string, Map<string, UserSession>>(); // roomId -> (use
 const roomStrokes = new Map<string, Stroke[]>(); // roomId -> Stroke[]
 
 const PORT = parseInt(process.env.PORT || "3001", 10);
-const wss = new WebSocketServer({ port: PORT });
+const wss = new WebSocketServer({ port: PORT, host: "0.0.0.0" });
 
 console.log(`> Standalone WebSocket server running on ws://localhost:${PORT}`);
 
@@ -112,6 +112,28 @@ wss.on("connection", (ws: WebSocket) => {
             type: "cursor-move",
             userId,
             cursor,
+          });
+          break;
+        }
+
+        case "rtc-offer":
+        case "rtc-answer":
+        case "rtc-ice": {
+          const { targetUserId } = data;
+          if (!targetUserId) return;
+          const targetSession = roomUsers.get(roomId)?.get(targetUserId);
+          if (targetSession && targetSession.ws.readyState === WebSocket.OPEN) {
+            targetSession.ws.send(JSON.stringify(data));
+          }
+          break;
+        }
+
+        case "user-speaking": {
+          const { isSpeaking } = data;
+          broadcastToRoom(roomId, ws, {
+            type: "user-speaking",
+            userId,
+            isSpeaking,
           });
           break;
         }
