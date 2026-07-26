@@ -18,6 +18,7 @@ interface CanvasStore {
 
   // Audio State
   isMuted: boolean;
+  micPermissionDenied: boolean;
 
   setRoomId: (roomId: string) => void;
   setTool: (tool: Tool) => void;
@@ -43,6 +44,7 @@ interface CanvasStore {
   // Audio Actions
   toggleMute: () => void;
   setSpeaking: (userId: string, isSpeaking: boolean) => void;
+  setMicPermissionDenied: (denied: boolean) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>((set) => ({
@@ -58,6 +60,7 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   users: [],
   cursors: {},
   isMuted: true,
+  micPermissionDenied: false,
 
   setRoomId: (roomId) => set({ roomId }),
   setTool: (tool) => set({ tool }),
@@ -150,4 +153,5 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   setSpeaking: (userId, isSpeaking) => set((state) => ({
     users: state.users.map((u) => u.id === userId ? { ...u, isSpeaking } : u),
   })),
+  setMicPermissionDenied: (denied) => set({ micPermissionDenied: denied }),
 }));
