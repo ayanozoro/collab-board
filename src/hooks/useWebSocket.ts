@@ -2,11 +2,20 @@ import { useEffect } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 
 let globalWs: WebSocket | null = null;
+type SignalingListener = (data: any) => void;
+const signalingListeners = new Set<SignalingListener>();
 
 export function sendWSMessage(msg: any) {
   if (globalWs && globalWs.readyState === WebSocket.OPEN) {
     globalWs.send(JSON.stringify(msg));
   }
+}
+
+export function addSignalingListener(listener: SignalingListener) {
+  signalingListeners.add(listener);
+  return () => {
+    signalingListeners.delete(listener);
+  };
 }
 
 // Throttled cursor sender to prevent network flooding
@@ -42,7 +51,6 @@ export function useWebSocket(roomId: string) {
     clearRemoteCanvas,
     setStrokes,
     updateCursor,
-    removeCursor,
   } = useCanvasStore();
 
   useEffect(() => {
@@ -78,6 +86,9 @@ export function useWebSocket(roomId: string) {
         const data = JSON.parse(event.data);
         const { type } = data;
 
+        // Relay signaling data to any registered audio listeners
+        signalingListeners.forEach((listener) => listener(data));
+
         switch (type) {
           case "room-state":
             setStrokes(data.strokes);
@@ -95,7 +106,6 @@ export function useWebSocket(roomId: string) {
             removeRemoteStroke(data.strokeId);
             break;
           case "cursor-move":
-            // Don't register cursor updates for self
             if (data.userId !== currentUser.id) {
               updateCursor(data.userId, {
                 x: data.cursor.x,
@@ -105,6 +115,16 @@ export function useWebSocket(roomId: string) {
               });
             }
             break;
+          case "audio-state": {
+            const currentUsers = useCanvasStore.getState().users;
+            const updatedUsers = currentUsers.map((u) =>
+              u.id === data.userId
+                ? { ...u, isMuted: data.isMuted, isSpeaking: data.isSpeaking }
+                : u
+            );
+            setUsers(updatedUsers);
+            break;
+          }
         }
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
@@ -135,7 +155,6 @@ export function useWebSocket(roomId: string) {
     clearRemoteCanvas,
     setStrokes,
     updateCursor,
-    removeCursor,
   ]);
 
   return {

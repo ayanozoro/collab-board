@@ -37,8 +37,15 @@ export default function PresenceBar({ roomId }: PresenceBarProps) {
             style={{ backgroundColor: u.color }}
           >
             {getInitials(u.name)}
-            
-            {/* Visual self/host indicator indicator */}
+
+            {/* Muted mic badge indicator */}
+            {u.isMuted && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#172129] border border-[#4a4455] text-[10px] text-[#958da1]">
+                <span className="material-symbols-outlined text-[10px]">mic_off</span>
+              </span>
+            )}
+
+            {/* Visual self indicator */}
             {isSelf && (
               <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>

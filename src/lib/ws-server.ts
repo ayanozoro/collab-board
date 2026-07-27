@@ -71,6 +71,8 @@ if (wantsSecure && existsSync(certPath) && existsSync(keyPath)) {
   console.log(`> Standalone WebSocket server running on ws://0.0.0.0:${PORT} (Insecure HTTP)`);
 }
 
+import { handleAudioSignaling } from "./audio-signaling";
+
 wss.on("connection", (ws: WebSocket) => {
   let currentRoomId: string | null = null;
   let currentUserId: string | null = null;
@@ -78,6 +80,11 @@ wss.on("connection", (ws: WebSocket) => {
   ws.on("message", (rawMessage: string) => {
     try {
       const data = JSON.parse(rawMessage);
+
+      // Delegate WebRTC audio signaling messages first
+      const isAudioHandled = handleAudioSignaling(ws, data, roomUsers);
+      if (isAudioHandled) return;
+
       const { type, roomId, userId } = data;
 
       if (!roomId) return;

@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 import { sendWSMessage } from "@/hooks/useWebSocket";
+import { useAudio } from "@/hooks/useAudio";
 
 export default function BottomBar() {
   const [zoom, setZoom] = useState(100);
   const { undo, redo, historyIndex, history, roomId, strokes } = useCanvasStore();
+  const { isMuted, isDeafened, isSpeaking, toggleMute, toggleDeafen } = useAudio(roomId || "");
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -67,6 +69,41 @@ export default function BottomBar() {
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">redo</span>
+        </button>
+      </div>
+
+      <div className="h-4 w-px bg-[#4a4455]/40" />
+
+      {/* Voice Chat Controls */}
+      <div className="flex items-center gap-1">
+        <button
+          title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
+          onClick={toggleMute}
+          className={`p-1.5 rounded-lg transition-all cursor-pointer flex items-center justify-center ${
+            !isMuted
+              ? isSpeaking
+                ? "bg-[#10b981]/20 text-[#10b981] ring-2 ring-[#10b981] shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+                : "bg-[#7c3aed]/20 text-[#d2bbff]"
+              : "hover:bg-[#2c363f]/50 text-[#958da1]"
+          }`}
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {!isMuted ? "mic" : "mic_off"}
+          </span>
+        </button>
+
+        <button
+          title={isDeafened ? "Undeafen Audio" : "Deafen Audio"}
+          onClick={toggleDeafen}
+          className={`p-1.5 rounded-lg transition-all cursor-pointer flex items-center justify-center ${
+            isDeafened
+              ? "bg-red-500/20 text-red-400 ring-1 ring-red-500/40"
+              : "hover:bg-[#2c363f]/50 text-[#ccc3d8]"
+          }`}
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {!isDeafened ? "volume_up" : "volume_off"}
+          </span>
         </button>
       </div>
 
