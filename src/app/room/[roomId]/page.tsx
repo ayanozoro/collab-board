@@ -11,7 +11,7 @@ export async function generateMetadata({
   const { roomId } = await params;
   return {
     title: `Room ${roomId} — CollabBoard`,
-    description: "Real-time collaborative whiteboard with audio.",
+    description: "Real-time collaborative whiteboard for sketching and brainstorming.",
   };
 }
 

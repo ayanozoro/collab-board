@@ -16,10 +16,6 @@ interface CanvasStore {
   users: User[];
   cursors: Record<string, { x: number; y: number; name: string; color: string }>;
 
-  // Audio State
-  isMuted: boolean;
-  micPermissionDenied: boolean;
-
   setRoomId: (roomId: string) => void;
   setTool: (tool: Tool) => void;
   setColor: (color: string) => void;
@@ -41,10 +37,6 @@ interface CanvasStore {
   removeRemoteStroke: (strokeId: string) => void;
   clearRemoteCanvas: () => void;
 
-  // Audio Actions
-  toggleMute: () => void;
-  setSpeaking: (userId: string, isSpeaking: boolean) => void;
-  setMicPermissionDenied: (denied: boolean) => void;
 }
 
 export const useCanvasStore = create<CanvasStore>((set) => ({
@@ -59,9 +51,6 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   currentUser: null,
   users: [],
   cursors: {},
-  isMuted: true,
-  micPermissionDenied: false,
-
   setRoomId: (roomId) => set({ roomId }),
   setTool: (tool) => set({ tool }),
   setColor: (color) => set({ color }),
@@ -148,10 +137,4 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
     strokes: [],
   }),
 
-  // Audio Actions
-  toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
-  setSpeaking: (userId, isSpeaking) => set((state) => ({
-    users: state.users.map((u) => u.id === userId ? { ...u, isSpeaking } : u),
-  })),
-  setMicPermissionDenied: (denied) => set({ micPermissionDenied: denied }),
 }));

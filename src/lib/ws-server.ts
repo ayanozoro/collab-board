@@ -1,6 +1,9 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { Stroke } from "../types/drawing";
 import { User } from "../types/user";
+import { createServer as createHttpsServer } from "https";
+import { readFileSync, existsSync } from "fs";
+import path from "path";
 
 interface UserSession {
   user: User;
@@ -12,9 +15,61 @@ const roomUsers = new Map<string, Map<string, UserSession>>(); // roomId -> (use
 const roomStrokes = new Map<string, Stroke[]>(); // roomId -> Stroke[]
 
 const PORT = parseInt(process.env.PORT || "3001", 10);
-const wss = new WebSocketServer({ port: PORT, host: "0.0.0.0" });
 
-console.log(`> Standalone WebSocket server running on ws://localhost:${PORT}`);
+let wss: WebSocketServer;
+const certPath = path.join(process.cwd(), "certificates/localhost.pem");
+const keyPath = path.join(process.cwd(), "certificates/localhost-key.pem");
+const envPath = path.join(process.cwd(), ".env.local");
+
+let wantsSecure = false;
+if (existsSync(envPath)) {
+  const envContent = readFileSync(envPath, "utf-8");
+  if (envContent.includes("NEXT_PUBLIC_WS_URL=wss://")) {
+    wantsSecure = true;
+  }
+}
+
+if (wantsSecure && existsSync(certPath) && existsSync(keyPath)) {
+  const server = createHttpsServer({
+    cert: readFileSync(certPath),
+    key: readFileSync(keyPath),
+  }, (req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>CollabBoard WebSocket Server</title>
+          <style>
+            body { font-family: system-ui, sans-serif; background: #060f17; color: #d2bbff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { border: 1px solid rgba(124,58,237,0.2); background: #0b1521; padding: 2.5rem; border-radius: 1.25rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(124,58,237,0.1); text-align: center; max-width: 420px; }
+            h1 { color: #4cd7f6; margin-top: 0; font-size: 1.5rem; }
+            p { color: #a0aec0; line-height: 1.5; font-size: 0.95rem; }
+            .badge { display: inline-block; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #10b981; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <span class="badge">SSL Certificate Trusted</span>
+            <h1>Secure Connection Established</h1>
+            <p>Your browser has successfully accepted the self-signed SSL/TLS certificate for the WebSocket server.</p>
+            <p style="color: #64748b; margin-top: 1.5rem; font-size: 0.85rem;">You can now close this tab and return to the whiteboard app.</p>
+          </div>
+        </body>
+      </html>
+    `);
+  });
+  wss = new WebSocketServer({ server });
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`> Standalone WebSocket server running on wss://0.0.0.0:${PORT} (Secure HTTPS)`);
+  });
+} else {
+  if (wantsSecure) {
+    console.warn("> WARNING: SSL certificates not found at certificates/localhost.pem or localhost-key.pem. Falling back to HTTP.");
+  }
+  wss = new WebSocketServer({ port: PORT, host: "0.0.0.0" });
+  console.log(`> Standalone WebSocket server running on ws://0.0.0.0:${PORT} (Insecure HTTP)`);
+}
 
 wss.on("connection", (ws: WebSocket) => {
   let currentRoomId: string | null = null;
@@ -112,28 +167,6 @@ wss.on("connection", (ws: WebSocket) => {
             type: "cursor-move",
             userId,
             cursor,
-          });
-          break;
-        }
-
-        case "rtc-offer":
-        case "rtc-answer":
-        case "rtc-ice": {
-          const { targetUserId } = data;
-          if (!targetUserId) return;
-          const targetSession = roomUsers.get(roomId)?.get(targetUserId);
-          if (targetSession && targetSession.ws.readyState === WebSocket.OPEN) {
-            targetSession.ws.send(JSON.stringify(data));
-          }
-          break;
-        }
-
-        case "user-speaking": {
-          const { isSpeaking } = data;
-          broadcastToRoom(roomId, ws, {
-            type: "user-speaking",
-            userId,
-            isSpeaking,
           });
           break;
         }

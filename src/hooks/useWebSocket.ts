@@ -1,16 +1,6 @@
 import { useEffect } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 
-type SignalingCallback = (data: any) => void;
-const signalingListeners = new Set<SignalingCallback>();
-
-export function addSignalingListener(cb: SignalingCallback) {
-  signalingListeners.add(cb);
-  return () => {
-    signalingListeners.delete(cb);
-  };
-}
-
 let globalWs: WebSocket | null = null;
 
 export function sendWSMessage(msg: any) {
@@ -53,7 +43,6 @@ export function useWebSocket(roomId: string) {
     setStrokes,
     updateCursor,
     removeCursor,
-    setSpeaking,
   } = useCanvasStore();
 
   useEffect(() => {
@@ -116,16 +105,6 @@ export function useWebSocket(roomId: string) {
               });
             }
             break;
-          case "user-speaking":
-            setSpeaking(data.userId, data.isSpeaking);
-            break;
-          case "rtc-offer":
-          case "rtc-answer":
-          case "rtc-ice":
-            if (data.targetUserId === currentUser?.id) {
-              signalingListeners.forEach((listener) => listener(data));
-            }
-            break;
         }
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
@@ -157,7 +136,6 @@ export function useWebSocket(roomId: string) {
     setStrokes,
     updateCursor,
     removeCursor,
-    setSpeaking,
   ]);
 
   return {

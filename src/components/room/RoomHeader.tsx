@@ -1,12 +1,15 @@
 "use client";
 
 import PresenceBar from "./PresenceBar";
+import { useUser, UserButton } from "@clerk/nextjs";
 
 interface RoomHeaderProps {
   roomId: string;
 }
 
 export default function RoomHeader({ roomId }: RoomHeaderProps) {
+  const { isSignedIn, isLoaded } = useUser();
+
   function handleShare() {
     navigator.clipboard?.writeText(roomId);
   }
@@ -39,6 +42,8 @@ export default function RoomHeader({ roomId }: RoomHeaderProps) {
       {/* Right: avatars + share */}
       <div className="flex items-center gap-5">
         <PresenceBar roomId={roomId} />
+
+        {isLoaded && isSignedIn && <UserButton />}
 
         <button
           onClick={handleShare}

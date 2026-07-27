@@ -2,14 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useUser } from "@clerk/nextjs";
 import { useCanvasStore } from "@/store/canvasStore";
 import { useWebSocket, sendCursorMove } from "@/hooks/useWebSocket";
-import { useAudio } from "@/hooks/useAudio";
 import Canvas, { type CanvasHandle } from "./Canvas";
 import Toolbar from "./Toolbar";
 import RoomHeader from "./RoomHeader";
 import BottomBar from "./BottomBar";
-import AudioControls from "./AudioControls";
 import CursorOverlay from "./CursorOverlay";
 
 const GUEST_NAMES = [
@@ -39,42 +38,55 @@ interface RoomClientProps {
 export default function RoomClient({ roomId }: RoomClientProps) {
   const canvasRef = useRef<CanvasHandle>(null);
   const { currentUser, setCurrentUser, setRoomId } = useCanvasStore();
+  const { user, isLoaded } = useUser();
 
-  // 1. Establish guest session profile on mount
+  // 1. Establish session profile (Clerk or Guest fallback)
   useEffect(() => {
     setRoomId(roomId);
-    if (typeof window === "undefined") return;
+    if (!isLoaded) return;
 
-    let userSession = sessionStorage.getItem("collab-user");
-    let parsedUser = null;
+    if (user) {
+      // Use authenticated Clerk identity
+      const displayName = user.fullName || user.firstName || user.username || "Creator";
+      const charCodeSum = user.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const userColor = CURATED_COLORS[charCodeSum % CURATED_COLORS.length];
 
-    if (userSession) {
-      try {
-        parsedUser = JSON.parse(userSession);
-      } catch {
-        parsedUser = null;
+      setCurrentUser({
+        id: user.id,
+        name: displayName,
+        color: userColor,
+      });
+    } else {
+      // Guest fallback identity
+      if (typeof window === "undefined") return;
+      let userSession = sessionStorage.getItem("collab-user");
+      let parsedUser = null;
+
+      if (userSession) {
+        try {
+          parsedUser = JSON.parse(userSession);
+        } catch {
+          parsedUser = null;
+        }
       }
-    }
 
-    if (!parsedUser) {
-      const randomName = GUEST_NAMES[Math.floor(Math.random() * GUEST_NAMES.length)];
-      const randomColor = CURATED_COLORS[Math.floor(Math.random() * CURATED_COLORS.length)];
-      parsedUser = {
-        id: uuidv4(),
-        name: `${randomName} #${Math.floor(100 + Math.random() * 900)}`,
-        color: randomColor,
-      };
-      sessionStorage.setItem("collab-user", JSON.stringify(parsedUser));
-    }
+      if (!parsedUser) {
+        const randomName = GUEST_NAMES[Math.floor(Math.random() * GUEST_NAMES.length)];
+        const randomColor = CURATED_COLORS[Math.floor(Math.random() * CURATED_COLORS.length)];
+        parsedUser = {
+          id: uuidv4(),
+          name: `${randomName} #${Math.floor(100 + Math.random() * 900)}`,
+          color: randomColor,
+        };
+        sessionStorage.setItem("collab-user", JSON.stringify(parsedUser));
+      }
 
-    setCurrentUser(parsedUser);
-  }, [roomId, setCurrentUser, setRoomId]);
+      setCurrentUser(parsedUser);
+    }
+  }, [roomId, user, isLoaded, setCurrentUser, setRoomId]);
 
   // 2. Initialize WebSocket sync
   useWebSocket(roomId);
-
-  // 3. Initialize Audio communication
-  useAudio();
 
   // 3. Track and emit local cursor movements
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -144,11 +156,6 @@ export default function RoomClient({ roomId }: RoomClientProps) {
 
       {/* Floating bottom controls */}
       <BottomBar />
-
-      {/* Audio controls — keep existing functionality */}
-      <div className="fixed top-6 right-[180px] z-50">
-        <AudioControls />
-      </div>
     </div>
   );
 }

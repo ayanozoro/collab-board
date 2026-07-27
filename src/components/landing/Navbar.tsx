@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const { isSignedIn, isLoaded } = useUser();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -22,7 +24,7 @@ export default function Navbar() {
     >
       <div className="flex justify-between items-center px-6 py-3 w-full max-w-7xl mx-auto">
         {/* Logo */}
-        <div className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <span className="material-symbols-outlined text-[#d2bbff] text-3xl">
             grid_view
           </span>
@@ -32,7 +34,7 @@ export default function Navbar() {
           >
             CollabBoard
           </span>
-        </div>
+        </Link>
 
         {/* Nav links (desktop) */}
         <nav className="hidden md:flex items-center gap-8">
@@ -48,14 +50,32 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Actions */}
+        {/* Auth Actions */}
         <div className="flex items-center gap-3">
-          <button className="px-5 py-2 rounded-full text-sm font-semibold text-[#dae3f0] hover:bg-[#2c363f]/50 transition-colors">
-            Sign In
-          </button>
-          <button className="btn-primary px-5 py-2 rounded-full text-sm font-semibold text-white">
-            Get Started
-          </button>
+          {isLoaded && !isSignedIn && (
+            <>
+              <SignInButton mode="modal">
+                <button className="px-5 py-2 rounded-full text-sm font-semibold text-[#dae3f0] hover:bg-[#2c363f]/50 transition-colors">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="btn-primary px-5 py-2 rounded-full text-sm font-semibold text-white">
+                  Get Started
+                </button>
+              </SignUpButton>
+            </>
+          )}
+
+          {isLoaded && isSignedIn && (
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-9 h-9 border border-[#d2bbff]/40 shadow-md",
+                },
+              }}
+            />
+          )}
         </div>
       </div>
     </header>

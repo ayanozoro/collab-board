@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --experimental-https --experimental-https-key certificates/localhost-key.pem --experimental-https-cert certificates/localhost.pem",
     "ws:dev": "tsx src/lib/ws-server.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.6.1",
     "nanoid": "^5.1.16",
     "next": "16.2.11",
     "react": "19.2.4",
