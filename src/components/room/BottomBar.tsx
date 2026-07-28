@@ -6,8 +6,18 @@ import { sendWSMessage } from "@/hooks/useWebSocket";
 import { useAudio } from "@/hooks/useAudio";
 
 export default function BottomBar() {
-  const [zoom, setZoom] = useState(100);
-  const { undo, redo, historyIndex, history, roomId, strokes } = useCanvasStore();
+  const {
+    undo,
+    redo,
+    historyIndex,
+    history,
+    roomId,
+    strokes,
+    zoom,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+  } = useCanvasStore();
   const { isMuted, isDeafened, isSpeaking, toggleMute, toggleDeafen } = useAudio(roomId || "");
 
   const canUndo = historyIndex > 0;
@@ -113,17 +123,17 @@ export default function BottomBar() {
       <div className="flex items-center gap-1">
         <button
           title="Zoom out"
-          onClick={() => setZoom((z) => Math.max(10, z - 10))}
+          onClick={zoomOut}
           className="p-1 rounded hover:bg-[#2c363f]/50 text-[#ccc3d8] transition-colors cursor-pointer"
         >
           <span className="material-symbols-outlined text-[20px]">remove</span>
         </button>
         <span className="text-sm font-medium text-[#dae3f0] min-w-[48px] text-center">
-          {zoom}%
+          {Math.round(zoom * 100)}%
         </span>
         <button
           title="Zoom in"
-          onClick={() => setZoom((z) => Math.min(400, z + 10))}
+          onClick={zoomIn}
           className="p-1 rounded hover:bg-[#2c363f]/50 text-[#ccc3d8] transition-colors cursor-pointer"
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
@@ -134,8 +144,8 @@ export default function BottomBar() {
 
       {/* Reset zoom */}
       <button
-        title="Reset zoom"
-        onClick={() => setZoom(100)}
+        title="Reset zoom and pan"
+        onClick={resetZoom}
         className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-[#2c363f]/50 text-[#ccc3d8] hover:text-[#d2bbff] transition-colors group cursor-pointer"
       >
         <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">
@@ -146,3 +156,4 @@ export default function BottomBar() {
     </footer>
   );
 }
+

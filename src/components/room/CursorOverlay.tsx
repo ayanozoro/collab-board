@@ -3,20 +3,23 @@
 import { useCanvasStore } from "@/store/canvasStore";
 
 export default function CursorOverlay() {
-  const cursors = useCanvasStore((state) => state.cursors);
+  const { cursors, zoom, pan } = useCanvasStore();
 
   return (
     <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
       {Object.entries(cursors).map(([userId, c]) => {
         if (c.x === undefined || c.y === undefined) return null;
 
+        const screenX = c.x * zoom + pan.x;
+        const screenY = c.y * zoom + pan.y;
+
         return (
           <div
             key={userId}
             className="absolute transition-all duration-75 ease-out"
             style={{
-              left: `${c.x}px`,
-              top: `${c.y}px`,
+              left: `${screenX}px`,
+              top: `${screenY}px`,
             }}
           >
             {/* SVG Cursor Pointer */}

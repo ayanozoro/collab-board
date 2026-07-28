@@ -39,7 +39,7 @@ interface RoomClientProps {
 
 export default function RoomClient({ roomId }: RoomClientProps) {
   const canvasRef = useRef<CanvasHandle>(null);
-  const { currentUser, setCurrentUser, setRoomId } = useCanvasStore();
+  const { currentUser, setCurrentUser, setRoomId, zoom, pan } = useCanvasStore();
   const { user, isLoaded } = useUser();
 
   // 1. Establish session profile (Clerk or Guest fallback)
@@ -90,18 +90,21 @@ export default function RoomClient({ roomId }: RoomClientProps) {
   // 2. Initialize WebSocket sync
   useWebSocket(roomId);
 
-  // 3. Track and emit local cursor movements
+  // 3. Track and emit local cursor movements in World Coordinates
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!currentUser) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+
+    const worldX = (screenX - pan.x) / zoom;
+    const worldY = (screenY - pan.y) / zoom;
 
     sendCursorMove(
       roomId,
       currentUser.id,
-      x,
-      y,
+      worldX,
+      worldY,
       currentUser.name,
       currentUser.color
     );
@@ -125,15 +128,17 @@ export default function RoomClient({ roomId }: RoomClientProps) {
       className="relative h-screen w-screen overflow-hidden select-none"
       style={{ backgroundColor: "#060f17" }}
     >
-      {/* Dot grid canvas background */}
+      {/* Dynamic dot grid canvas background */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(rgba(149,141,161,0.12) 1px, transparent 0)",
-          backgroundSize: "20px 20px",
+            "radial-gradient(rgba(149,141,161,0.14) 1px, transparent 0)",
+          backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
+          backgroundPosition: `${pan.x}px ${pan.y}px`,
         }}
       />
+
 
       {/* Atmospheric violet glow at top */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-40 bg-[#7c3aed]/10 blur-[100px] pointer-events-none z-10" />

@@ -7,9 +7,7 @@ const FADE_DURATION_MS = 1500; // 1.5 seconds fadeout
 
 export default function LaserOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const laserTrails = useCanvasStore((state) => state.laserTrails);
-  const setLaserPoints = useCanvasStore((state) => state.setLaserPoints);
-  const clearLaserTrail = useCanvasStore((state) => state.clearLaserTrail);
+  const { laserTrails, setLaserPoints, clearLaserTrail, zoom, pan } = useCanvasStore();
 
   // High DPI resize handler
   useEffect(() => {
@@ -42,7 +40,6 @@ export default function LaserOverlay() {
       if (!ctx) return;
 
       const now = Date.now();
-      const rect = canvas.getBoundingClientRect();
 
       // Clear overlay canvas
       ctx.save();
@@ -50,7 +47,10 @@ export default function LaserOverlay() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
 
-      let stateHasExpiredPoints = false;
+      // Apply zoom & pan transformation
+      ctx.save();
+      ctx.translate(pan.x, pan.y);
+      ctx.scale(zoom, zoom);
 
       // Render trails for all active users
       Object.entries(laserTrails).forEach(([userId, points]) => {
@@ -60,7 +60,6 @@ export default function LaserOverlay() {
         const validPoints = points.filter((p) => now - p.timestamp < FADE_DURATION_MS);
 
         if (validPoints.length !== points.length) {
-          stateHasExpiredPoints = true;
           // Clean up store asynchronously if all points expired
           if (validPoints.length === 0) {
             setTimeout(() => clearLaserTrail(userId), 0);
@@ -145,12 +144,15 @@ export default function LaserOverlay() {
         }
       });
 
+      ctx.restore();
+
       animationFrameId = requestAnimationFrame(render);
     }
 
     animationFrameId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [laserTrails, clearLaserTrail, setLaserPoints]);
+  }, [laserTrails, clearLaserTrail, setLaserPoints, zoom, pan]);
+
 
   return (
     <canvas

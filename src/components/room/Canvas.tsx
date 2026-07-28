@@ -26,13 +26,11 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(function Canvas(
     function resize() {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
+      // DPR transform handled by useCanvas for consistent layering
     }
     resize();
     window.addEventListener("resize", resize);

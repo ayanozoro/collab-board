@@ -11,6 +11,10 @@ interface CanvasStore {
   history: Stroke[][];
   historyIndex: number;
 
+  // Infinite Canvas Zoom & Pan State
+  zoom: number;
+  pan: { x: number; y: number };
+
   // Laser Trails State (userId -> LaserPoint[])
   laserTrails: Record<string, LaserPoint[]>;
 
@@ -28,6 +32,14 @@ interface CanvasStore {
   clearCanvas: () => void;
   undo: () => void;
   redo: () => void;
+
+  // Infinite Canvas Actions
+  setZoom: (zoom: number | ((prev: number) => number)) => void;
+  setPan: (pan: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+  zoomToPoint: (factor: number, pivotX: number, pivotY: number) => void;
 
   // Laser Trail Actions
   addLaserPoints: (userId: string, points: LaserPoint[]) => void;
@@ -56,7 +68,11 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   history: [[]],
   historyIndex: 0,
 
+  zoom: 1.0,
+  pan: { x: 0, y: 0 },
+
   laserTrails: {},
+
 
   currentUser: null,
   users: [],
@@ -65,6 +81,36 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   setTool: (tool) => set({ tool }),
   setColor: (color) => set({ color }),
   setSize: (size) => set({ size }),
+
+  setZoom: (zoomOrFn) => set((state) => {
+    const nextZoom = typeof zoomOrFn === "function" ? zoomOrFn(state.zoom) : zoomOrFn;
+    return { zoom: Math.max(0.1, Math.min(5.0, nextZoom)) };
+  }),
+
+  setPan: (panOrFn) => set((state) => {
+    const nextPan = typeof panOrFn === "function" ? panOrFn(state.pan) : panOrFn;
+    return { pan: nextPan };
+  }),
+
+  zoomIn: () => set((state) => ({
+    zoom: Math.min(5.0, Math.round((state.zoom + 0.15) * 100) / 100),
+  })),
+
+  zoomOut: () => set((state) => ({
+    zoom: Math.max(0.1, Math.round((state.zoom - 0.15) * 100) / 100),
+  })),
+
+  resetZoom: () => set({ zoom: 1.0, pan: { x: 0, y: 0 } }),
+
+  zoomToPoint: (factor, pivotX, pivotY) => set((state) => {
+    const oldZoom = state.zoom;
+    const newZoom = Math.max(0.1, Math.min(5.0, oldZoom * factor));
+    if (newZoom === oldZoom) return {};
+    const newPanX = pivotX - (pivotX - state.pan.x) * (newZoom / oldZoom);
+    const newPanY = pivotY - (pivotY - state.pan.y) * (newZoom / oldZoom);
+    return { zoom: newZoom, pan: { x: newPanX, y: newPanY } };
+  }),
+
   
   addLaserPoints: (userId, points) => set((state) => {
     const existing = state.laserTrails[userId] || [];

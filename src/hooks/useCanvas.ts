@@ -15,7 +15,11 @@ export function useCanvas(
   options: UseCanvasOptions
 ) {
   const isDrawing = useRef(false);
+  const isPanning = useRef(false);
+  const lastPanPos = useRef<Point>({ x: 0, y: 0 });
+  const isSpacePressed = useRef(false);
   const currentPoints = useRef<Point[]>([]);
+
   const {
     strokes,
     addStroke,
@@ -27,9 +31,68 @@ export function useCanvas(
     historyIndex,
     currentUser,
     addLaserPoints,
+    zoom,
+    pan,
+    setPan,
+    zoomToPoint,
   } = useCanvasStore();
 
   const { tool, color, size } = options;
+
+  // Track spacebar for panning
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      if (e.code === "Space" && !e.repeat) {
+        isSpacePressed.current = true;
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        isSpacePressed.current = false;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  // Wheel listener for non-passive zooming & panning
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const pivotX = e.clientX - rect.left;
+      const pivotY = e.clientY - rect.top;
+
+      if (e.ctrlKey || e.metaKey) {
+        const factor = e.deltaY < 0 ? 1.08 : 0.92;
+        zoomToPoint(factor, pivotX, pivotY);
+      } else {
+        setPan((prev) => ({
+          x: prev.x - e.deltaX,
+          y: prev.y - e.deltaY,
+        }));
+      }
+    };
+
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", handleWheel);
+  }, [canvasRef, zoomToPoint, setPan]);
 
   // Redraw helper
   const drawAll = () => {
@@ -44,19 +107,26 @@ export function useCanvas(
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
 
+    // Apply zoom and pan matrix
+    ctx.save();
+    ctx.translate(pan.x, pan.y);
+    ctx.scale(zoom, zoom);
+
     // Redraw completed strokes
     strokes.forEach((stroke) => {
       drawStroke(ctx, stroke);
     });
+
+    ctx.restore();
   };
 
-  // Redraw when strokes change
+  // Redraw when strokes, zoom, or pan change
   useEffect(() => {
     drawAll();
-  }, [strokes]);
+  }, [strokes, zoom, pan]);
 
-  // Translate screen events to canvas coordinates
-  const getCanvasCoords = (
+  // Screen coordinates relative to canvas element
+  const getScreenCoords = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ): Point => {
     const canvas = canvasRef.current;
@@ -85,6 +155,17 @@ export function useCanvas(
     };
   };
 
+  // Convert Screen coordinates to World coordinates
+  const getCanvasCoords = (
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ): Point => {
+    const screen = getScreenCoords(e);
+    return {
+      x: (screen.x - pan.x) / zoom,
+      y: (screen.y - pan.y) / zoom,
+    };
+  };
+
   const emitLaserPoint = (p: Point) => {
     if (!currentUser) return;
     const laserPt: LaserPoint = {
@@ -100,11 +181,17 @@ export function useCanvas(
     }
   };
 
-
   const startDrawing = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
-    if (tool === "select") return;
+    const screen = getScreenCoords(e);
+    const isMiddleClick = "button" in e && e.button === 1;
+
+    if (tool === "select" || isSpacePressed.current || isMiddleClick) {
+      isPanning.current = true;
+      lastPanPos.current = screen;
+      return;
+    }
     
     const p = getCanvasCoords(e);
     isDrawing.current = true;
@@ -122,6 +209,8 @@ export function useCanvas(
 
     if (tool === "pen" || tool === "eraser") {
       ctx.save();
+      ctx.translate(pan.x, pan.y);
+      ctx.scale(zoom, zoom);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.strokeStyle = color;
@@ -144,6 +233,16 @@ export function useCanvas(
   const draw = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
+    const screen = getScreenCoords(e);
+
+    if (isPanning.current) {
+      const dx = screen.x - lastPanPos.current.x;
+      const dy = screen.y - lastPanPos.current.y;
+      setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+      lastPanPos.current = screen;
+      return;
+    }
+
     if (!isDrawing.current || tool === "select") return;
 
     const p = getCanvasCoords(e);
@@ -161,6 +260,8 @@ export function useCanvas(
     if (tool === "pen" || tool === "eraser") {
       const lastPoint = currentPoints.current[currentPoints.current.length - 1];
       ctx.save();
+      ctx.translate(pan.x, pan.y);
+      ctx.scale(zoom, zoom);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.strokeStyle = color;
@@ -191,15 +292,26 @@ export function useCanvas(
         size,
         points: [currentPoints.current[0], p],
       };
+
+      ctx.save();
+      ctx.translate(pan.x, pan.y);
+      ctx.scale(zoom, zoom);
       drawStroke(ctx, tempStroke);
+      ctx.restore();
     }
   };
 
   const stopDrawing = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
+    if (isPanning.current) {
+      isPanning.current = false;
+      return;
+    }
+
     if (!isDrawing.current || tool === "select") return;
     isDrawing.current = false;
+
 
     if (tool === "laser") {
       currentPoints.current = [];
