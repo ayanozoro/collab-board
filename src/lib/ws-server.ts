@@ -178,6 +178,20 @@ wss.on("connection", (ws: WebSocket) => {
           break;
         }
 
+        case "laser-draw": {
+          const { laserPoints } = data;
+          if (!laserPoints || !Array.isArray(laserPoints)) return;
+
+          // Broadcast laser points to other clients in the room
+          broadcastToRoom(roomId, ws, {
+            type: "laser-draw",
+            userId,
+            laserPoints,
+          });
+          break;
+        }
+
+
         default:
           console.warn(`Unknown message type: ${type}`);
       }

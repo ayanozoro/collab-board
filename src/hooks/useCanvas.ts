@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useCanvasStore } from "@/store/canvasStore";
-import { Point, Stroke, Tool } from "@/types/drawing";
-import { sendWSMessage } from "./useWebSocket";
+import { Point, Stroke, Tool, LaserPoint } from "@/types/drawing";
+import { sendWSMessage, sendLaserPoints } from "./useWebSocket";
 
 interface UseCanvasOptions {
   tool: Tool;
@@ -25,6 +25,8 @@ export function useCanvas(
     roomId,
     history,
     historyIndex,
+    currentUser,
+    addLaserPoints,
   } = useCanvasStore();
 
   const { tool, color, size } = options;
@@ -83,6 +85,22 @@ export function useCanvas(
     };
   };
 
+  const emitLaserPoint = (p: Point) => {
+    if (!currentUser) return;
+    const laserPt: LaserPoint = {
+      x: p.x,
+      y: p.y,
+      timestamp: Date.now(),
+      color: color || currentUser.color,
+      size: Math.max(8, size * 2.2),
+    };
+    addLaserPoints(currentUser.id, [laserPt]);
+    if (roomId) {
+      sendLaserPoints(roomId, currentUser.id, [laserPt]);
+    }
+  };
+
+
   const startDrawing = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
@@ -91,6 +109,11 @@ export function useCanvas(
     const p = getCanvasCoords(e);
     isDrawing.current = true;
     currentPoints.current = [p];
+
+    if (tool === "laser") {
+      emitLaserPoint(p);
+      return;
+    }
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -124,6 +147,12 @@ export function useCanvas(
     if (!isDrawing.current || tool === "select") return;
 
     const p = getCanvasCoords(e);
+
+    if (tool === "laser") {
+      emitLaserPoint(p);
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -172,7 +201,13 @@ export function useCanvas(
     if (!isDrawing.current || tool === "select") return;
     isDrawing.current = false;
 
+    if (tool === "laser") {
+      currentPoints.current = [];
+      return;
+    }
+
     const p = getCanvasCoords(e);
+
     
     if (tool !== "pen" && tool !== "eraser") {
       currentPoints.current.push(p);

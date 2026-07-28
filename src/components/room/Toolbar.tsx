@@ -1,16 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
 import { Tool } from "@/types/drawing";
 import { sendWSMessage } from "@/hooks/useWebSocket";
 
 const TOOLS = [
-  { id: "select", icon: "arrow_selector_tool", label: "Select (V)" },
-  { id: "pen",    icon: "edit",                label: "Pen (P)" },
-  { id: "eraser", icon: "ink_eraser",          label: "Eraser (E)" },
-  { id: "rect",   icon: "crop_square",         label: "Rectangle (R)" },
-  { id: "circle", icon: "circle",              label: "Circle (C)" },
-  { id: "line",   icon: "horizontal_rule",     label: "Line (L)" },
+  { id: "select", icon: "arrow_selector_tool", label: "Select (V)", key: "v" },
+  { id: "laser",  icon: "flare",               label: "Laser Pointer (K)", key: "k" },
+  { id: "pen",    icon: "edit",                label: "Pen (P)", key: "p" },
+  { id: "eraser", icon: "ink_eraser",          label: "Eraser (E)", key: "e" },
+  { id: "rect",   icon: "crop_square",         label: "Rectangle (R)", key: "r" },
+  { id: "circle", icon: "circle",              label: "Circle (C)", key: "c" },
+  { id: "line",   icon: "horizontal_rule",     label: "Line (L)", key: "l" },
 ] as const;
 
 const COLORS = [
@@ -47,6 +49,29 @@ export default function Toolbar({ onUndo: _onUndo, onRedo: _onRedo, onClear }: T
     strokes,
     roomId,
   } = useCanvasStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in input or textarea
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      const matched = TOOLS.find((t) => t.key === key);
+      if (matched) {
+        setTool(matched.id as Tool);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [setTool]);
+
 
   return (
     <aside className="fixed left-6 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-4">

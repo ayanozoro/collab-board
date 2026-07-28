@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Tool, Stroke } from "@/types/drawing";
+import { Tool, Stroke, LaserPoint } from "@/types/drawing";
 import { User } from "@/types/user";
 
 interface CanvasStore {
@@ -10,6 +10,9 @@ interface CanvasStore {
   strokes: Stroke[];
   history: Stroke[][];
   historyIndex: number;
+
+  // Laser Trails State (userId -> LaserPoint[])
+  laserTrails: Record<string, LaserPoint[]>;
 
   // Collaborative Presence State
   currentUser: User | null;
@@ -25,6 +28,11 @@ interface CanvasStore {
   clearCanvas: () => void;
   undo: () => void;
   redo: () => void;
+
+  // Laser Trail Actions
+  addLaserPoints: (userId: string, points: LaserPoint[]) => void;
+  setLaserPoints: (userId: string, points: LaserPoint[]) => void;
+  clearLaserTrail: (userId: string) => void;
 
   // Collaborative Presence Actions
   setCurrentUser: (user: User) => void;
@@ -48,6 +56,8 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   history: [[]],
   historyIndex: 0,
 
+  laserTrails: {},
+
   currentUser: null,
   users: [],
   cursors: {},
@@ -55,6 +65,30 @@ export const useCanvasStore = create<CanvasStore>((set) => ({
   setTool: (tool) => set({ tool }),
   setColor: (color) => set({ color }),
   setSize: (size) => set({ size }),
+  
+  addLaserPoints: (userId, points) => set((state) => {
+    const existing = state.laserTrails[userId] || [];
+    return {
+      laserTrails: {
+        ...state.laserTrails,
+        [userId]: [...existing, ...points],
+      },
+    };
+  }),
+
+  setLaserPoints: (userId, points) => set((state) => ({
+    laserTrails: {
+      ...state.laserTrails,
+      [userId]: points,
+    },
+  })),
+
+  clearLaserTrail: (userId) => set((state) => {
+    const newTrails = { ...state.laserTrails };
+    delete newTrails[userId];
+    return { laserTrails: newTrails };
+  }),
+
   
   setStrokes: (strokes) => set((state) => {
     const newHistory = state.history.slice(0, state.historyIndex + 1);

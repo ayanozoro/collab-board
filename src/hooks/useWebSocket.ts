@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useCanvasStore } from "@/store/canvasStore";
+import { LaserPoint } from "@/types/drawing";
 
 let globalWs: WebSocket | null = null;
 type SignalingListener = (data: any) => void;
@@ -42,6 +43,19 @@ export function sendCursorMove(
   }
 }
 
+export function sendLaserPoints(
+  roomId: string,
+  userId: string,
+  laserPoints: LaserPoint[]
+) {
+  sendWSMessage({
+    type: "laser-draw",
+    roomId,
+    userId,
+    laserPoints,
+  });
+}
+
 export function useWebSocket(roomId: string) {
   const {
     currentUser,
@@ -51,6 +65,7 @@ export function useWebSocket(roomId: string) {
     clearRemoteCanvas,
     setStrokes,
     updateCursor,
+    addLaserPoints,
   } = useCanvasStore();
 
   useEffect(() => {
@@ -115,6 +130,12 @@ export function useWebSocket(roomId: string) {
               });
             }
             break;
+          case "laser-draw":
+            if (data.userId !== currentUser.id && data.laserPoints) {
+              addLaserPoints(data.userId, data.laserPoints);
+            }
+            break;
+
           case "audio-state": {
             const currentUsers = useCanvasStore.getState().users;
             const updatedUsers = currentUsers.map((u) =>

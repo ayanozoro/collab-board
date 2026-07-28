@@ -10,6 +10,8 @@ import Toolbar from "./Toolbar";
 import RoomHeader from "./RoomHeader";
 import BottomBar from "./BottomBar";
 import CursorOverlay from "./CursorOverlay";
+import LaserOverlay from "./LaserOverlay";
+
 
 const GUEST_NAMES = [
   "Creative Panda",
@@ -147,6 +149,7 @@ export default function RoomClient({ roomId }: RoomClientProps) {
           onMouseLeave={handleMouseLeave}
         >
           <Canvas ref={canvasRef} roomId={roomId} />
+          <LaserOverlay />
           <CursorOverlay />
         </div>
       </main>
